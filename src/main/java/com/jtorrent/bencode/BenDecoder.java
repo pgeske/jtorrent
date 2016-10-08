@@ -25,15 +25,19 @@ public class BenDecoder {
 
             /* Establish condition for finishing an item */
             if (cur != null) {
-                if (cur.getType() == BenType.B_STRING && accumulator.length() == accLimit) {
-                    finishing = true;
-                } else if (bencode.charAt(i) == 'e') {
+                if (cur.getType() == BenType.B_STRING) {
+                    if (accumulator.length() == accLimit - 1) finishing = true;
+                }
+                else if (bencode.charAt(i) == 'e') {
                     finishing = true;
                 }
             }
+            if (finishing) starting = false;
 
+//            System.out.println(i + " " + starting + " " + finishing);
             /*Starting a new item*/
             if (starting) {
+                BenItem parent = cur;
                 switch (bencode.charAt(i)) {
                     case 'l':
                         cur = new BenItem(new ArrayList<BenItem>());
@@ -49,9 +53,9 @@ public class BenDecoder {
                             throw new InvalidBencodeException("Invalid bencode.");
                         }
                         cur = new BenItem(BenType.B_STRING);
-                        accLimit = (Character.getNumericValue(bencode.charAt(i)) + 0);
-
+                        accLimit = Character.getNumericValue(bencode.charAt(i)) + 1;
                 }
+                cur.setParent(parent);
             }
             /*Finishing an item*/
             else if (finishing) {
@@ -60,7 +64,7 @@ public class BenDecoder {
                         cur.setValue(Integer.parseInt(accumulator));
                         break;
                     case B_STRING:
-                        cur.setValue(accumulator);
+                        cur.setValue(accumulator.substring(1) + bencode.charAt(i));
                         break;
                     case B_LIST:
                         break;
@@ -74,6 +78,9 @@ public class BenDecoder {
                     //TODO
                     break;
                 }
+                cur = cur.getParent();
+                accumulator = "";
+
             }
             /*In middle of item*/
             else {
