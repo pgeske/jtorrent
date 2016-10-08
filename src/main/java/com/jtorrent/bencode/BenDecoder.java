@@ -13,11 +13,20 @@ public class BenDecoder {
         BenItem result;
         int index;
         // Get initial BenItem
-            //TODO
+        switch (bencode.charAt(0)) {
+            case 'l':
+                cur = new BenItem(new ArrayList<BenItem>());
+                break;
+            case 'd':
+                cur = new BenItem(new HashMap<String, BenItem>());
+        }
+        if (bencode.charAt(0) == 'l') {
+            cur = new BenItem(new ArrayList<BenItem>());
+        }
+        else if (bencode.charAt(0) )
 
         while (cur != null) {
             // Starting new item: create new BenItem and set parent to cur
-                //TODO
 
             // In the middle of item: add chars to accumulator
                 //TODO
