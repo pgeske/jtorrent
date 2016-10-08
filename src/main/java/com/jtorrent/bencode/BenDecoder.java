@@ -34,7 +34,6 @@ public class BenDecoder {
             }
             if (finishing) starting = false;
 
-//            System.out.println(i + " " + starting + " " + finishing);
             /*Starting a new item*/
             if (starting) {
                 BenItem parent = cur;

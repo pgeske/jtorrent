@@ -14,6 +14,9 @@ public class BenItem {
     private BenItem parent;
     private BenType type;
 
+    public BenItem() {
+        super();
+    }
 
     public BenItem(Integer v) {
         this.payload = v;
@@ -42,14 +45,10 @@ public class BenItem {
         this.type = type;
     }
 
-    public BenItem() {
-        super();
-    }
 
     public BenItem getParent() {
         return this.parent;
     }
-
 
     public Object getValue() {
         return this.payload;
@@ -63,5 +62,25 @@ public class BenItem {
 
     public void setValue(Object v) { this.payload = v; }
 
+    public String toJSON() {
+        String json = "";
+        switch (this.type) {
+            case B_INT:
+                json = this.payload.toString();
+                break;
+            case B_STRING:
+                json = (String) this.payload;
+                break;
+            case B_LIST:
+                json += '[';
+                ArrayList<BenItem> al = (ArrayList<BenItem>) this.payload;
+                for (int i = 0; i < al.size(); i++) {
+                    json += al.get(i).toJSON();
+                    if (i != al.size() - 1) json += ',';
+                }
+                json += ']';
+        }
+        return json;
+    }
 
 }
