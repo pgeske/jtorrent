@@ -8,36 +8,78 @@ import java.util.HashMap;
  */
 public class BenDecoder {
 
-    public static BenItem decode(String bencode) {
-        BenItem cur;
-        BenItem result;
-        int index;
-        // Get initial BenItem
-        switch (bencode.charAt(0)) {
-            case 'l':
-                cur = new BenItem(new ArrayList<BenItem>());
-                break;
-            case 'd':
-                cur = new BenItem(new HashMap<String, BenItem>());
+    public static BenItem decode(String bencode) throws InvalidBencodeException {
+        BenItem cur = null;
+        String accumulator = "";
+        int accLimit = 0;
+        for (int i = 0; i < bencode.length(); i++) {
+
+            /*Establish condition for starting a new item*/
+            boolean starting = false;
+            boolean finishing = false;
+            if (cur == null) {
+                starting = true;
+            } else if (cur.getType() == BenType.B_DICT || cur.getType() == BenType.B_LIST) {
+                starting = true;
+            }
+
+            /* Establish condition for finishing an item */
+            if (cur != null) {
+                if (cur.getType() == BenType.B_STRING && accumulator.length() == accLimit) {
+                    finishing = true;
+                } else if (bencode.charAt(i) == 'e') {
+                    finishing = true;
+                }
+            }
+
+            /*Starting a new item*/
+            if (starting) {
+                switch (bencode.charAt(i)) {
+                    case 'l':
+                        cur = new BenItem(new ArrayList<BenItem>());
+                        break;
+                    case 'd':
+                        cur = new BenItem(new HashMap<String, BenItem>());
+                        break;
+                    case 'i':
+                        cur = new BenItem(BenType.B_INT);
+                        break;
+                    default:
+                        if (!Character.isDigit(bencode.charAt(i))) {
+                            throw new InvalidBencodeException("Invalid bencode.");
+                        }
+                        cur = new BenItem(BenType.B_STRING);
+                        accLimit = (Character.getNumericValue(bencode.charAt(i)) + 0);
+
+                }
+            }
+            /*Finishing an item*/
+            else if (finishing) {
+                switch (cur.getType()) {
+                    case B_INT:
+                        cur.setValue(Integer.parseInt(accumulator));
+                        break;
+                    case B_STRING:
+                        cur.setValue(accumulator);
+                        break;
+                    case B_LIST:
+                        break;
+                    case B_DICT:
+                        break;
+                }
+                if (cur.getParent() == null) break;
+                if (cur.getParent().getType() == BenType.B_LIST) {
+                    ((ArrayList<BenItem>) cur.getParent().getValue()).add(cur);
+                } else if (cur.getParent().getType() == BenType.B_DICT) {
+                    //TODO
+                    break;
+                }
+            }
+            /*In middle of item*/
+            else {
+                accumulator = accumulator + bencode.charAt(i);
+            }
         }
-        if (bencode.charAt(0) == 'l') {
-            cur = new BenItem(new ArrayList<BenItem>());
-        }
-        else if (bencode.charAt(0) )
-
-        while (cur != null) {
-            // Starting new item: create new BenItem and set parent to cur
-
-            // In the middle of item: add chars to accumulator
-                //TODO
-
-            // Finished item: store accumulated value in cur, push cur to parent, and set cur to parent
-                //TODO
-                // If cur's parent is null, then we must be finished decoding
-        }
-
-        return result;
-
-
+        return cur;
     }
 }
