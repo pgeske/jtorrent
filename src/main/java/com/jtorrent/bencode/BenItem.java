@@ -2,6 +2,7 @@ package com.jtorrent.bencode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Created by philip on 10/2/16.
@@ -13,6 +14,7 @@ public class BenItem {
     private Object payload;
     private BenItem parent;
     private BenType type;
+    private String key = "";
 
     public BenItem() {
         super();
@@ -56,11 +58,15 @@ public class BenItem {
 
     public BenType getType() { return this.type; }
 
+    public String getKey() { return this.key; }
+
     public void setParent(BenItem parent) {
         this.parent = parent;
     }
 
     public void setValue(Object v) { this.payload = v; }
+
+    public void setKey(String s) { this.key = s; }
 
     public String toJSON() {
         String json = "";
@@ -79,6 +85,18 @@ public class BenItem {
                     if (i != al.size() - 1) json += ',';
                 }
                 json += ']';
+                break;
+            case B_DICT:
+                json += '{';
+                HashMap<String, BenItem> dict = (HashMap<String, BenItem>) this.payload;
+                int index = 0;
+                for (String key : dict.keySet()) {
+                    json += key + ':' + dict.get(key).toJSON();
+                    if (index++ != dict.keySet().size() - 1) {
+                        json += ',';
+                    }
+                }
+                json += '}';
         }
         return json;
     }

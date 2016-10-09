@@ -2,6 +2,7 @@ package com.jtorrent.bencode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 
 /**
  * Created by philip on 10/8/16.
@@ -33,6 +34,7 @@ public class BenDecoder {
                 }
             }
             if (finishing) starting = false;
+
 
             /*Starting a new item*/
             if (starting) {
@@ -71,11 +73,21 @@ public class BenDecoder {
                         break;
                 }
                 if (cur.getParent() == null) break;
+                /*Add this finished element to its parent*/
                 if (cur.getParent().getType() == BenType.B_LIST) {
-                    ((ArrayList<BenItem>) cur.getParent().getValue()).add(cur);
+                    ArrayList<BenItem> al = (ArrayList<BenItem>) cur.getParent().getValue();
+                    al.add(cur);
                 } else if (cur.getParent().getType() == BenType.B_DICT) {
-                    //TODO
-                    break;
+                    /*Inserting key,value pair*/
+                    if (cur.getParent().getKey().length() > 0) {
+                        HashMap<String, BenItem> dict = (HashMap<String, BenItem>) cur.getParent().getValue();
+                        dict.put(cur.getParent().getKey(), cur);
+                        cur.getParent().setKey("");
+                    }
+                    /*Saving key in current BenItem*/
+                    else {
+                        cur.getParent().setKey(accumulator.substring(1) + bencode.charAt(i));
+                    }
                 }
                 cur = cur.getParent();
                 accumulator = "";
