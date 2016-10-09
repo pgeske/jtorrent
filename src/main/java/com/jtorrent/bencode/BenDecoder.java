@@ -35,9 +35,6 @@ public class BenDecoder {
                 }
             }
             if (finishing) starting = false;
-            System.out.println("AccLimit: " + accLimit + " " + accumulator.length());
-            System.out.println(i + " " + starting + " " + bencode.charAt(i) + " " + accumulator);
-            System.out.println("Finishing: " + finishing);
 
 
             /*Starting a new item*/
@@ -57,7 +54,6 @@ public class BenDecoder {
                         accLimit = Integer.parseInt(accumulator);
                         accumulator = "";
                         cur = new BenItem(BenType.B_STRING);
-                        System.out.println(accLimit);
 
                         break;
                     default:
@@ -66,8 +62,6 @@ public class BenDecoder {
                         }
                         accumulator += bencode.charAt(i);
                         continue;
-//                        cur = new BenItem(BenType.B_STRING);
-//                        accLimit = Character.getNumericValue(bencode.charAt(i)) + 1;
                 }
                 cur.setParent(parent);
             }

@@ -1,8 +1,12 @@
 package com.jtorrent.bencode;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * Created by philip on 10/2/16.
@@ -98,7 +102,10 @@ public class BenItem {
                 }
                 json += '}';
         }
-        return json;
+        /*Prettify JSON*/
+        Gson gs = new GsonBuilder().setPrettyPrinting().create();
+        JsonParser jp = new JsonParser();
+        return gs.toJson(jp.parse(json));
     }
 
 }
