@@ -15,6 +15,7 @@ public class BenDecoder {
         int accLimit = 0;
         for (int i = 0; i < bencode.length(); i++) {
 
+
             /*Establish condition for starting a new item*/
             boolean starting = false;
             boolean finishing = false;
@@ -34,6 +35,9 @@ public class BenDecoder {
                 }
             }
             if (finishing) starting = false;
+            System.out.println("AccLimit: " + accLimit + " " + accumulator.length());
+            System.out.println(i + " " + starting + " " + bencode.charAt(i) + " " + accumulator);
+            System.out.println("Finishing: " + finishing);
 
 
             /*Starting a new item*/
@@ -49,12 +53,21 @@ public class BenDecoder {
                     case 'i':
                         cur = new BenItem(BenType.B_INT);
                         break;
+                    case ':':
+                        accLimit = Integer.parseInt(accumulator);
+                        accumulator = "";
+                        cur = new BenItem(BenType.B_STRING);
+                        System.out.println(accLimit);
+
+                        break;
                     default:
                         if (!Character.isDigit(bencode.charAt(i))) {
                             throw new InvalidBencodeException("Invalid bencode.");
                         }
-                        cur = new BenItem(BenType.B_STRING);
-                        accLimit = Character.getNumericValue(bencode.charAt(i)) + 1;
+                        accumulator += bencode.charAt(i);
+                        continue;
+//                        cur = new BenItem(BenType.B_STRING);
+//                        accLimit = Character.getNumericValue(bencode.charAt(i)) + 1;
                 }
                 cur.setParent(parent);
             }
@@ -65,7 +78,7 @@ public class BenDecoder {
                         cur.setValue(Integer.parseInt(accumulator));
                         break;
                     case B_STRING:
-                        cur.setValue(accumulator.substring(1) + bencode.charAt(i));
+                        cur.setValue(accumulator + bencode.charAt(i));
                         break;
                     case B_LIST:
                         break;
@@ -86,7 +99,7 @@ public class BenDecoder {
                     }
                     /*Saving key in current BenItem*/
                     else {
-                        cur.getParent().setKey(accumulator.substring(1) + bencode.charAt(i));
+                        cur.getParent().setKey(accumulator + bencode.charAt(i));
                     }
                 }
                 cur = cur.getParent();

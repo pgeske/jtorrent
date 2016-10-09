@@ -13,7 +13,7 @@ public class App
     public static void main( String[] args ) throws InvalidBencodeException
     {
         BenDecoder bd = new BenDecoder();
-        String test = "d9:publisher3:bobe";
+        String test = "d9:publisher3:bob17:publisher-webpage15:www.example.com18:publisher.location4:homee";
         BenItem bi = bd.decode(test);
         System.out.println(bi.toJSON());
     }
