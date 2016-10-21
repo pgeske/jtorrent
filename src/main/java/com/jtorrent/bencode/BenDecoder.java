@@ -1,21 +1,20 @@
 package com.jtorrent.bencode;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Stack;
 
 /**
  * Created by philip on 10/8/16.
  */
 public class BenDecoder {
-
-    public static BenItem decode(String bencode) throws InvalidBencodeException {
+    public static BenItem decode(InputStream is) throws InvalidBencodeException, IOException {
         BenItem cur = null;
         String accumulator = "";
         int accLimit = 0;
-        for (int i = 0; i < bencode.length(); i++) {
-
-
+        int i;
+        while ((i = is.read()) != -1) {
             /*Establish condition for starting a new item*/
             boolean starting = false;
             boolean finishing = false;
@@ -30,7 +29,7 @@ public class BenDecoder {
                 if (cur.getType() == BenType.B_STRING) {
                     if (accumulator.length() == accLimit - 1) finishing = true;
                 }
-                else if (bencode.charAt(i) == 'e') {
+                else if ((char)i == 'e') {
                     finishing = true;
                 }
             }
@@ -40,7 +39,7 @@ public class BenDecoder {
             /*Starting a new item*/
             if (starting) {
                 BenItem parent = cur;
-                switch (bencode.charAt(i)) {
+                switch ((char)i) {
                     case 'l':
                         cur = new BenItem(new ArrayList<BenItem>());
                         break;
@@ -54,13 +53,12 @@ public class BenDecoder {
                         accLimit = Integer.parseInt(accumulator);
                         accumulator = "";
                         cur = new BenItem(BenType.B_STRING);
-
                         break;
                     default:
-                        if (!Character.isDigit(bencode.charAt(i))) {
+                        if (!Character.isDigit((char)i)) {
                             throw new InvalidBencodeException("Invalid bencode.");
                         }
-                        accumulator += bencode.charAt(i);
+                        accumulator += (char)i;
                         continue;
                 }
                 cur.setParent(parent);
@@ -72,7 +70,7 @@ public class BenDecoder {
                         cur.setValue(Integer.parseInt(accumulator));
                         break;
                     case B_STRING:
-                        cur.setValue(accumulator + bencode.charAt(i));
+                        cur.setValue(accumulator + (char)i);
                         break;
                     case B_LIST:
                         break;
@@ -93,7 +91,7 @@ public class BenDecoder {
                     }
                     /*Saving key in current BenItem*/
                     else {
-                        cur.getParent().setKey(accumulator + bencode.charAt(i));
+                        cur.getParent().setKey(accumulator + (char)i);
                     }
                 }
                 cur = cur.getParent();
@@ -102,7 +100,7 @@ public class BenDecoder {
             }
             /*In middle of item*/
             else {
-                accumulator = accumulator + bencode.charAt(i);
+                accumulator = accumulator + (char)i;
             }
         }
         return cur;

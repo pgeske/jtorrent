@@ -1,20 +1,20 @@
 package com.jtorrent;
 
-import com.jtorrent.bencode.BenDecoder;
-import com.jtorrent.bencode.BenItem;
-import com.jtorrent.bencode.BenType;
-import com.jtorrent.bencode.InvalidBencodeException;
+import com.jtorrent.bencode.*;
 
+import java.io.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
 public class App 
 {
-    public static void main( String[] args ) throws InvalidBencodeException
+    public static void main( String[] args ) throws InvalidBencodeException, FileNotFoundException, IOException
     {
-        BenDecoder bd = new BenDecoder();
-        String test = "d9:publisher3:bob17:publisher-webpage15:www.example.com18:publisher.location4:home5:helloli32ei8000eee";
-        BenItem bi = bd.decode(test);
-        System.out.println(bi.toJSON());
+        File f = new File("/home/philip/Downloads/sample.torrent");
+        FileInputStream fs = new FileInputStream(f);
+        BenItem be = BenDecoder.decode(fs);
+        MetaInfo mi = new MetaInfo(be);
+        System.out.println(mi.getInfo().find("pieces").getValue());
     }
 }

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,10 +16,11 @@ import java.util.HashMap;
 
 public class BenItem {
 
-    private Object payload;
+    protected Object payload;
     private BenItem parent;
     private BenType type;
     private String key = "";
+
 
     public BenItem() {
         super();
@@ -72,14 +74,27 @@ public class BenItem {
 
     public void setKey(String s) { this.key = s; }
 
-    public String toJSON() {
+    public BenItem find(String key) throws InvalidBencodeException{
+        if (this.type != BenType.B_DICT) {
+            throw new InvalidBencodeException("To find a value given a key, " +
+                    "this BenItem must be a dictionary");
+        }
+        HashMap<String, BenItem> map = (HashMap<String, BenItem>) this.payload;
+        return map.get(key);
+    }
+
+    public String toJSON() throws UnsupportedEncodingException{
+        System.out.println(this.type);
         String json = "";
         switch (this.type) {
             case B_INT:
                 json = this.payload.toString();
                 break;
             case B_STRING:
-                json = (String) this.payload;
+                String s = (String) this.payload;
+                byte[] b = s.getBytes("UTF-8");
+                s = new String(b, "UTF-8");
+                json = s;
                 break;
             case B_LIST:
                 json += '[';
@@ -103,9 +118,10 @@ public class BenItem {
                 json += '}';
         }
         /*Prettify JSON*/
-        Gson gs = new GsonBuilder().setPrettyPrinting().create();
-        JsonParser jp = new JsonParser();
-        return gs.toJson(jp.parse(json));
+//        Gson gs = new GsonBuilder().setPrettyPrinting().create();
+//        JsonParser jp = new JsonParser();
+//        return gs.toJson(jp.parse(json));
+        return json;
     }
 
 }
