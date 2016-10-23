@@ -18,10 +18,11 @@ public class BenEncoder {
         String bencode = "";
         switch (bi.getType()) {
             case B_STRING:
-                bencode = bi.getString().length() + ':' + bi.getString();
+                Integer len = bi.getString().getBytes().length;
+                bencode = len.toString() + ':' + bi.getString();
                 break;
             case B_INT:
-                bencode = bi.getInteger().toString();
+                bencode = 'i' + bi.getInteger().toString() + 'e';
                 break;
             case B_LIST:
                 bencode += 'l';
@@ -35,7 +36,8 @@ public class BenEncoder {
                 Iterator it = bi.getDictionary().entrySet().iterator();
                 while (it.hasNext()) {
                     HashMap.Entry<String, BenItem> pair = (HashMap.Entry<String, BenItem>) it.next();
-                    bencode += pair.getKey() + pair.getValue();
+                    BenItem nb = new BenItem(pair.getKey());
+                    bencode += encode(nb) + encode(pair.getValue());
                 }
                 bencode += 'e';
                 break;

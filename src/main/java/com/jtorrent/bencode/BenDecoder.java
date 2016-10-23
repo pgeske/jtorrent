@@ -1,5 +1,6 @@
 package com.jtorrent.bencode;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,7 +10,15 @@ import java.util.HashMap;
  * Created by philip on 10/8/16.
  */
 public class BenDecoder {
+    /**
+     * Decodes bencode into BenItems.
+     * @param is The input stream of the bencode.
+     * @return The bencode decoded as BenItem
+     * @throws InvalidBencodeException
+     * @throws IOException
+     */
     public static BenItem decode(InputStream is) throws InvalidBencodeException, IOException {
+        System.out.println("Decoding");
         BenItem cur = null;
         String accumulator = "";
         int accLimit = 0;
@@ -105,4 +114,10 @@ public class BenDecoder {
         }
         return cur;
     }
+
+    public static BenItem decode(String s) throws InvalidBencodeException, IOException{
+        InputStream is = new ByteArrayInputStream(s.getBytes("UTF-8"));
+        return decode(is);
+    }
+
 }
