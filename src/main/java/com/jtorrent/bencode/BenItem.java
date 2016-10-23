@@ -62,6 +62,14 @@ public class BenItem {
         return this.payload;
     }
 
+    public String getString() { return (String) this.payload; }
+
+    public Integer getInteger() { return (Integer) this.payload; }
+
+    public ArrayList<BenItem> getList() { return (ArrayList<BenItem>) this.payload; }
+
+    public HashMap<String, BenItem> getDictionary() { return (HashMap<String, BenItem>) this.payload; }
+
     public BenType getType() { return this.type; }
 
     public String getKey() { return this.key; }
