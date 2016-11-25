@@ -1,5 +1,6 @@
 package com.jtorrent.bencode;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -14,11 +15,11 @@ public class BenEncoder {
      * @param bi The BenItem to be encoded.
      * @return bi encoded as bencode
      */
-    public static String encode(BenItem bi) {
+    public static String encode(BenItem bi) throws UnsupportedEncodingException{
         String bencode = "";
         switch (bi.getType()) {
             case B_STRING:
-                Integer len = bi.getString().getBytes().length;
+                Integer len = bi.getString().getBytes("US-ASCII").length;
                 bencode = len.toString() + ':' + bi.getString();
                 break;
             case B_INT:

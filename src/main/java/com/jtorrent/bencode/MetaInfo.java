@@ -1,5 +1,8 @@
 package com.jtorrent.bencode;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 /**
@@ -21,5 +24,12 @@ public class MetaInfo {
 
     public BenItem getInfo() throws InvalidBencodeException {
         return root.find("info");
+    }
+
+    public byte[] getInfoHash() throws NoSuchAlgorithmException, InvalidBencodeException, UnsupportedEncodingException{
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        String infoBencode = root.find("info").toBencode();
+        md.update(infoBencode.getBytes("UTF-8"));
+        return md.digest();
     }
 }

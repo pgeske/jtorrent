@@ -7,7 +7,7 @@ import com.google.gson.JsonParser;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Created by philip on 10/2/16.
@@ -38,7 +38,7 @@ public class BenItem {
         this.type = BenType.B_STRING;
     }
 
-    public BenItem(HashMap<String, BenItem> bd) {
+    public BenItem(LinkedHashMap<String, BenItem> bd) {
         this.payload = bd;
         this.type = BenType.B_DICT;
     }
@@ -62,13 +62,15 @@ public class BenItem {
         return this.payload;
     }
 
-    public String getString() { return (String) this.payload; }
+    public String getString() {
+        return (String) this.payload;
+    }
 
     public Integer getInteger() { return (Integer) this.payload; }
 
     public ArrayList<BenItem> getList() { return (ArrayList<BenItem>) this.payload; }
 
-    public HashMap<String, BenItem> getDictionary() { return (HashMap<String, BenItem>) this.payload; }
+    public LinkedHashMap<String, BenItem> getDictionary() { return (LinkedHashMap<String, BenItem>) this.payload; }
 
     public BenType getType() { return this.type; }
 
@@ -87,12 +89,11 @@ public class BenItem {
             throw new InvalidBencodeException("To find a value given a key, " +
                     "this BenItem must be a dictionary");
         }
-        HashMap<String, BenItem> map = (HashMap<String, BenItem>) this.payload;
+        LinkedHashMap<String, BenItem> map = (LinkedHashMap<String, BenItem>) this.payload;
         return map.get(key);
     }
 
     public String toJSON() throws UnsupportedEncodingException{
-        System.out.println(this.type);
         String json = "";
         switch (this.type) {
             case B_INT:
@@ -115,7 +116,7 @@ public class BenItem {
                 break;
             case B_DICT:
                 json += '{';
-                HashMap<String, BenItem> dict = (HashMap<String, BenItem>) this.payload;
+                LinkedHashMap<String, BenItem> dict = (LinkedHashMap<String, BenItem>) this.payload;
                 int index = 0;
                 for (String key : dict.keySet()) {
                     json += key + ':' + dict.get(key).toJSON();
@@ -125,11 +126,11 @@ public class BenItem {
                 }
                 json += '}';
         }
-        /*Prettify JSON*/
-//        Gson gs = new GsonBuilder().setPrettyPrinting().create();
-//        JsonParser jp = new JsonParser();
-//        return gs.toJson(jp.parse(json));
         return json;
+    }
+
+    public String toBencode() throws UnsupportedEncodingException {
+        return BenEncoder.encode(this);
     }
 
 }

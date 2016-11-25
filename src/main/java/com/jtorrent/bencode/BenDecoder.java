@@ -1,10 +1,8 @@
 package com.jtorrent.bencode;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Created by philip on 10/8/16.
@@ -17,8 +15,7 @@ public class BenDecoder {
      * @throws InvalidBencodeException
      * @throws IOException
      */
-    public static BenItem decode(InputStream is) throws InvalidBencodeException, IOException {
-        System.out.println("Decoding");
+    public static BenItem decode(BufferedInputStream is) throws InvalidBencodeException, IOException {
         BenItem cur = null;
         String accumulator = "";
         int accLimit = 0;
@@ -53,7 +50,7 @@ public class BenDecoder {
                         cur = new BenItem(new ArrayList<BenItem>());
                         break;
                     case 'd':
-                        cur = new BenItem(new HashMap<String, BenItem>());
+                        cur = new BenItem(new LinkedHashMap<String, BenItem>());
                         break;
                     case 'i':
                         cur = new BenItem(BenType.B_INT);
@@ -94,7 +91,7 @@ public class BenDecoder {
                 } else if (cur.getParent().getType() == BenType.B_DICT) {
                     /*Inserting key,value pair*/
                     if (cur.getParent().getKey().length() > 0) {
-                        HashMap<String, BenItem> dict = (HashMap<String, BenItem>) cur.getParent().getValue();
+                        LinkedHashMap<String, BenItem> dict = cur.getParent().getDictionary();
                         dict.put(cur.getParent().getKey(), cur);
                         cur.getParent().setKey("");
                     }
@@ -115,9 +112,14 @@ public class BenDecoder {
         return cur;
     }
 
-    public static BenItem decode(String s) throws InvalidBencodeException, IOException{
+    public static BenItem decode(String s) throws InvalidBencodeException, IOException {
         InputStream is = new ByteArrayInputStream(s.getBytes("UTF-8"));
-        return decode(is);
+        BufferedInputStream bs = new BufferedInputStream(is);
+        return decode(bs);
+    }
+
+    public static BenItem decode(FileInputStream fs) throws InvalidBencodeException, IOException {
+        return decode(new BufferedInputStream(fs));
     }
 
 }
