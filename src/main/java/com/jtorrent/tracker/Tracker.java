@@ -1,16 +1,14 @@
 package com.jtorrent.tracker;
 
+import com.jtorrent.bencode.BenDecoder;
+import com.jtorrent.bencode.BenEncoder;
 import com.jtorrent.bencode.BenItem;
+import com.jtorrent.bencode.InvalidBencodeException;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
@@ -46,7 +44,7 @@ public class Tracker {
         this.uploaded = 0;
         this.downloaded = 0;
         this.left = 0;
-        this.compact = 1;
+        this.compact = 0;
         this.event = "started";
     }
 
@@ -90,9 +88,15 @@ public class Tracker {
         ArrayList<String> parameters = new ArrayList<String>();
         // Add SHA-1 info hash to request
         if (this.info != null) {
-            String infoBencode = this.info.toBencode();
-//            byte[] infoHash = DigestUtils.sha1(this.info.toBencode().getBytes("ISO-8859-1"));
-//=            parameters.add("info_hash=" + URLEncoder.encode(new String(infoHash, "ISO-8859-1")));
+            String infoHash = DigestUtils.sha1Hex(this.info.toBencode().getBytes("ISO-8859-1"));
+            String urlHash = "";
+            for (int i = 0; i < infoHash.length(); i++) {
+                if (i % 2 == 0) {
+                    urlHash += '%';
+                }
+                urlHash += infoHash.charAt(i);
+            }
+            parameters.add("info_hash=" + urlHash);
         }
         // Append peer id
         if (this.peerId != null) {
@@ -128,16 +132,19 @@ public class Tracker {
 
     public BenItem getResponse()
             throws NoSuchAlgorithmException, UnsupportedEncodingException,
-            MalformedURLException, IOException
+            MalformedURLException, IOException, InvalidBencodeException
     {
-        HttpURLConnection con = (HttpURLConnection) this.getRequest().openConnection();
-        InputStream in = con.getInputStream();
-        int i;
-        String response = "";
-        while ((i = in.read()) != -1) {
-            response += (char) i;
-        }
-        return new BenItem(response);
-
+        URL request = this.getRequest();
+        InputStream is = request.openStream();
+        BufferedInputStream bs = new BufferedInputStream(is);
+//        BufferedInputStream bs = new BufferedInputStream(is);
+//        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+//        String bencode = "";
+//        String l;
+//        while ((l = br.readLine()) != null) {
+//            bencode += l;
+//        }
+//        System.out.println(bencode);
+        return BenDecoder.decode(bs);
     }
 }

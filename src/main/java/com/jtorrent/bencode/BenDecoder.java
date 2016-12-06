@@ -69,6 +69,7 @@ public class BenDecoder {
                 }
                 cur.setParent(parent);
             }
+
             /*Finishing an item*/
             else if (finishing) {
                 switch (cur.getType()) {
@@ -104,6 +105,7 @@ public class BenDecoder {
                 accumulator = "";
 
             }
+
             /*In middle of item*/
             else {
                 accumulator = accumulator + (char)i;
