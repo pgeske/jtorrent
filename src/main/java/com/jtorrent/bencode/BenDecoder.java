@@ -114,6 +114,10 @@ public class BenDecoder {
         return cur;
     }
 
+    public static BenItem decode(InputStream is) throws InvalidBencodeException, IOException {
+        return decode(new BufferedInputStream(is));
+    }
+
     public static BenItem decode(String s) throws InvalidBencodeException, IOException {
         InputStream is = new ByteArrayInputStream(s.getBytes("UTF-8"));
         BufferedInputStream bs = new BufferedInputStream(is);
