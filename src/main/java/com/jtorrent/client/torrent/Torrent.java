@@ -41,6 +41,15 @@ public class Torrent {
      */
     public String infoHash() throws InvalidBencodeException, UnsupportedEncodingException {
         return DigestUtils.sha1Hex(this.metaInfo.find("info").toBencode().getBytes("ISO-8859-1"));
+    }
 
+    /**
+     * Same as infoHash(), but this returns the hash as an array of bytes, instead of
+     * encoding them as hexadecimal to a String.
+     * @return A byte[20] array containing the SHA-1 hash
+     * @throws InvalidBencodeException
+     */
+    public byte[] infoHashBytes() throws InvalidBencodeException, UnsupportedEncodingException {
+        return DigestUtils.sha1(this.metaInfo.find("info").toBencode().getBytes("ISO-8859-1"));
     }
 }

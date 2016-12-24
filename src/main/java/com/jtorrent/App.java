@@ -17,8 +17,9 @@ public class App
         File f = new File("C:\\Users\\Philip\\Downloads\\ubuntu-16.10-desktop-amd64.iso.torrent");
         Torrent t = new Torrent(f);
         Client c = new Client(t);
-        for (Peer peer : c.getPeers()) {
-            System.out.println(peer.getIp() + ":" + peer.getPort());
-        }
+//        for (Peer peer : c.getPeers()) {
+//            System.out.println(peer.getIp() + ":" + peer.getPort());
+//        }
+        c.test();
     }
 }

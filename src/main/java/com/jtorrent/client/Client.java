@@ -22,6 +22,7 @@ public class Client {
     public Client(Torrent t) {
         this.peerId = "akdlakdiejsldifjelsk";
         this.trackerClient = new TrackerClient(this.peerId, t);
+        this.peerClient = new PeerClient(this.peerId, t);
     }
 
     /**
@@ -47,6 +48,11 @@ public class Client {
             peers[i] = peer;
         }
         return peers;
+    }
+
+    public void test() throws IOException, InvalidBencodeException {
+        Peer p = this.getPeers()[0];
+        this.peerClient.connect(p);
     }
 
 }
