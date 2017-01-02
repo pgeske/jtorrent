@@ -2,6 +2,7 @@ package com.jtorrent.client.peer;
 
 import com.jtorrent.bencode.InvalidBencodeException;
 import com.jtorrent.client.peer.protocol.Handshake;
+import com.jtorrent.client.peer.protocol.Message;
 import com.jtorrent.client.torrent.Torrent;
 
 import java.io.IOException;
@@ -32,6 +33,14 @@ public class Peer {
 
     public Integer getPort() { return this.port; }
 
+    /**
+     * initializes a TCP connection via a 2-way handshake with Peer, and returns Peer's response
+     * Handshake.
+     * @param clientHandshake
+     * @return The Handshake the Peer sends in response to the Client's handshake.
+     * @throws IOException
+     * @throws InvalidBencodeException
+     */
     public Handshake handshake(Handshake clientHandshake) throws IOException, InvalidBencodeException {
         this.connection = SocketChannel.open(new InetSocketAddress(this.ip, this.port));
         ByteBuffer handshakeBuffer = clientHandshake.getBuffer();
@@ -48,6 +57,14 @@ public class Peer {
             return new Handshake(response);
         }
         return null;
+    }
+
+    /**
+     * Sends a messge to the Peer via the socket channel.
+     * @param message The message to be sent.
+     */
+    public void send(Message message) {
+
     }
 
 }

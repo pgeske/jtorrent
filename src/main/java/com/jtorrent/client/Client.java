@@ -8,8 +8,6 @@ import com.jtorrent.client.torrent.Torrent;
 import com.jtorrent.client.tracker.TrackerClient;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by pgeske on 10/23/16.
@@ -49,10 +47,4 @@ public class Client {
         }
         return peers;
     }
-
-//    public byte[] test() throws IOException, InvalidBencodeException {
-//        Peer p = this.getPeers()[0];
-//        return this.peerClient.connect(p);
-//    }
-
 }

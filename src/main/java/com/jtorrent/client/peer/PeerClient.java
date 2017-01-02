@@ -26,5 +26,4 @@ public class PeerClient {
         this.peerId = peerId;
         this.torrent = torrent;
     }
-
 }
