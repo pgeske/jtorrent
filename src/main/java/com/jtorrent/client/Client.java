@@ -50,9 +50,9 @@ public class Client {
         return peers;
     }
 
-    public void test() throws IOException, InvalidBencodeException {
+    public byte[] test() throws IOException, InvalidBencodeException {
         Peer p = this.getPeers()[0];
-        this.peerClient.connect(p);
+        return this.peerClient.connect(p);
     }
 
 }

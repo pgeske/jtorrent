@@ -10,8 +10,8 @@ import java.nio.ByteBuffer;
  * Created by Philip on 1/1/2017.
  */
 public class Handshake {
-    private static final int HANDSHAKE_LENGTH = 68;
-    private static final String PSTR = "Bittorrent protocol";
+    public static final int HANDSHAKE_LENGTH = 68;
+    public static final String PSTR = "BitTorrent protocol";
 
     private String pstr;
     private byte[] reserved;
@@ -30,8 +30,12 @@ public class Handshake {
         this(torrent.infoHashBytes(), peerId);
     }
 
+    /**
+     * Unpacks a ByteBuffer into a Handshake.
+     * @param byteBuffer The ByteBuffer (in READ mode) to be unpacked
+     */
     public Handshake(ByteBuffer byteBuffer) {
-
+        int pstrLen = byteBuffer.get() & 0xFF;
     }
 
     public String getPstr() {
@@ -50,8 +54,14 @@ public class Handshake {
         return this.peerId;
     }
 
+    /**
+     * Packs Handshake parameters into a ByteBuffer, which can be fed into a peer connection.
+     * @return The handshake ByteBuffer in WRITE mode.
+     * @throws UnsupportedEncodingException
+     * @throws InvalidBencodeException
+     */
     public ByteBuffer getBuffer() throws UnsupportedEncodingException, InvalidBencodeException {
-        ByteBuffer handshakeBuffer = ByteBuffer.allocate(this.HANDSHAKE_LENGTH);
+        ByteBuffer handshakeBuffer = ByteBuffer.allocate(HANDSHAKE_LENGTH);
         handshakeBuffer.put((byte) this.pstr.length());
         handshakeBuffer.put(this.pstr.getBytes("ISO-8859-1"));
         handshakeBuffer.put(new byte[8]);

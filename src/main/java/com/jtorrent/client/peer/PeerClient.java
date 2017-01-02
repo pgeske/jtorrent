@@ -27,29 +27,4 @@ public class PeerClient {
         this.torrent = torrent;
     }
 
-    public void connect(Peer p) throws IOException, InvalidBencodeException {
-
-        // Construct handshake ByteBuffer
-        ByteBuffer handshakeBuffer = ByteBuffer.allocate(HANDSHAKE_LENGTH);
-        handshakeBuffer.put((byte) PSTRLEN);
-        handshakeBuffer.put(PSTR.getBytes("ISO-8859-1"));
-        handshakeBuffer.put(new byte[8]);
-        handshakeBuffer.put(this.torrent.infoHashBytes());
-        handshakeBuffer.put(this.peerId.getBytes("ISO-8859-1"));
-        handshakeBuffer.flip();
-
-        // Setup handshake with peer
-        SocketAddress address = new InetSocketAddress(p.getIp(), p.getPort());
-        SocketChannel socketChannel = SocketChannel.open(address);
-        socketChannel.write(handshakeBuffer);
-        ByteBuffer response = ByteBuffer.allocate(HANDSHAKE_LENGTH);
-        int bytesRead = socketChannel.read(response);
-        response.flip();
-        String responseString = "";
-        System.out.println(response);
-        while (response.hasRemaining()) {
-            char c = (char) response.get();
-            responseString += c;
-        }
-    }
 }
