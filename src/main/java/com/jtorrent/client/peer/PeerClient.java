@@ -4,8 +4,11 @@ import com.jtorrent.bencode.InvalidBencodeException;
 import com.jtorrent.client.torrent.Torrent;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 
 /**
  * Created by Philip on 12/10/2016.
@@ -25,27 +28,28 @@ public class PeerClient {
     }
 
     public void connect(Peer p) throws IOException, InvalidBencodeException {
-        // Construct the handshake byte[]
+
+        // Construct handshake ByteBuffer
         ByteBuffer handshakeBuffer = ByteBuffer.allocate(HANDSHAKE_LENGTH);
-        byte[] reserved = new byte[8];
-        handshakeBuffer.put((byte) 19);
+        handshakeBuffer.put((byte) PSTRLEN);
         handshakeBuffer.put(PSTR.getBytes("ISO-8859-1"));
         handshakeBuffer.put(new byte[8]);
         handshakeBuffer.put(this.torrent.infoHashBytes());
         handshakeBuffer.put(this.peerId.getBytes("ISO-8859-1"));
+        handshakeBuffer.flip();
 
-        // Setup a handshake with the peer
-        Socket s = new Socket(p.getIp(), p.getPort());
-        System.out.println(s);
-        BufferedInputStream in = new BufferedInputStream(s.getInputStream());
-        OutputStream out = s.getOutputStream();
-        out.write(handshakeBuffer.array());
-        String response = "";
-        for (int i = 0; i < HANDSHAKE_LENGTH; i++) {
-            int r = in.read();
-            response += (char) r;
-        }
+        // Setup handshake with peer
+        SocketAddress address = new InetSocketAddress(p.getIp(), p.getPort());
+        SocketChannel socketChannel = SocketChannel.open(address);
+        socketChannel.write(handshakeBuffer);
+        ByteBuffer response = ByteBuffer.allocate(HANDSHAKE_LENGTH);
+        int bytesRead = socketChannel.read(response);
+        response.flip();
+        String responseString = "";
         System.out.println(response);
-
+        while (response.hasRemaining()) {
+            char c = (char) response.get();
+            responseString += c;
+        }
     }
 }
