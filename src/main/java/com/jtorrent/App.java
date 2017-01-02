@@ -24,7 +24,14 @@ public class App
         Peer[] peers = c.getPeers();
         Handshake clientHandshake = new Handshake(t,"akdlakdiejsldifjelsk");
         for (Peer p: peers) {
-            p.handshake(clientHandshake);
+            try {
+                Handshake handshake = p.handshake(clientHandshake);
+                if (handshake != null) {
+                    System.out.println(handshake.getPeerId());
+                }
+            } catch (IOException e) {
+                continue;
+            }
         }
     }
 }

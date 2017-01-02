@@ -13,8 +13,8 @@ public class Handshake {
     public static final int HANDSHAKE_LENGTH = 68;
     public static final String PSTR = "BitTorrent protocol";
 
-    private String pstr;
-    private byte[] reserved;
+    private String pstr = this.PSTR;
+    private byte[] reserved = new byte[8];
     private byte[] infoHash;
     private String peerId;
 
@@ -22,8 +22,6 @@ public class Handshake {
     public Handshake(byte[] infoHash, String peerId) {
         this.infoHash = infoHash;
         this.peerId = peerId;
-        this.pstr = this.PSTR;
-        this.reserved = new byte[8];
     }
 
     public Handshake(Torrent torrent, String peerId) throws UnsupportedEncodingException, InvalidBencodeException {
@@ -36,6 +34,15 @@ public class Handshake {
      */
     public Handshake(ByteBuffer byteBuffer) {
         int pstrLen = byteBuffer.get() & 0xFF;
+        byte[] pstr = new byte[pstrLen];
+        byteBuffer.get(pstr);
+        this.pstr = new String(pstr);
+        byteBuffer.get(this.reserved);
+        byte[] infoHash = new byte[20];
+        byteBuffer.get(infoHash);
+        byte[] peerId = new byte[20];
+        byteBuffer.get(peerId);
+        this.peerId = new String(peerId);
     }
 
     public String getPstr() {

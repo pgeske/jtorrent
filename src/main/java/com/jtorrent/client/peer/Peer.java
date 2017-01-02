@@ -44,12 +44,9 @@ public class Peer {
         ByteBuffer response = ByteBuffer.allocate(Handshake.HANDSHAKE_LENGTH);
         int bytesRead = socketChannel.read(response);
         response.flip();
-        String responseString = "";
-        while (response.hasRemaining()) {
-            char c = (char) response.get();
-            responseString += c;
+        if (bytesRead != -1) {
+            return new Handshake(response);
         }
-        System.out.println(responseString);
         return null;
     }
 
