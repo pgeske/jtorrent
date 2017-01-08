@@ -21,6 +21,7 @@ public class Peer {
     private String ip;
     private Integer port;
     private SocketChannel connection;
+    private ByteBuffer messageBuffer;
 
     public Peer(String ip, Integer port) {
         this.ip = ip;
@@ -33,6 +34,18 @@ public class Peer {
 
     public Integer getPort() { return this.port; }
 
+    public SocketChannel getConnection() { return this.connection; }
+
+    /**
+     * Initializes a SocketChannel connection with the peer.
+     * @throws IOException
+     */
+    public void connect() throws IOException {
+        this.connection = SocketChannel.open();
+        this.connection.configureBlocking(false);
+        this.connection.connect(new InetSocketAddress(this.ip, this.port));
+    }
+
     /**
      * initializes a TCP connection via a 2-way handshake with Peer, and returns Peer's response
      * Handshake.
@@ -41,8 +54,7 @@ public class Peer {
      * @throws IOException
      * @throws InvalidBencodeException
      */
-    public Handshake handshake(Handshake clientHandshake) throws IOException, InvalidBencodeException {
-        this.connection = SocketChannel.open(new InetSocketAddress(this.ip, this.port));
+    public void handshake(Handshake clientHandshake) throws IOException, InvalidBencodeException {
         ByteBuffer handshakeBuffer = clientHandshake.getBuffer();
         handshakeBuffer.flip();
 
@@ -50,21 +62,29 @@ public class Peer {
         SocketAddress address = new InetSocketAddress(this.getIp(), this.getPort());
         SocketChannel socketChannel = SocketChannel.open(address);
         socketChannel.write(handshakeBuffer);
-        ByteBuffer response = ByteBuffer.allocate(Handshake.HANDSHAKE_LENGTH);
-        int bytesRead = socketChannel.read(response);
-        response.flip();
-        if (bytesRead != -1) {
-            return new Handshake(response);
-        }
-        return null;
+//        ByteBuffer response = ByteBuffer.allocate(Handshake.HANDSHAKE_LENGTH);
+//        int bytesRead = socketChannel.read(response);
+//        response.flip();
+//        if (bytesRead != -1) {
+//            return new Handshake(response);
+//        }
+//        return null;
     }
 
     /**
      * Sends a messge to the Peer via the socket channel.
      * @param message The message to be sent.
      */
-    public void send(Message message) {
-
+    public void send(Message message) throws IOException {
+        this.connection.write(message.getBuffer());
     }
+
+    /**
+     *
+     * @return
+     */
+//    public Message getMessage() {
+//        // TODO;
+//    }
 
 }

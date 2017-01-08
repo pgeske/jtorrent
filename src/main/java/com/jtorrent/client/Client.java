@@ -8,6 +8,7 @@ import com.jtorrent.client.torrent.Torrent;
 import com.jtorrent.client.tracker.TrackerClient;
 
 import java.io.IOException;
+import java.net.ConnectException;
 
 /**
  * Created by pgeske on 10/23/16.
